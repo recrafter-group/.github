@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "scripts": {
+    "formatter:fix": "npx prettier --write \"**/*.{json,yml,md}\"",
+    "formatter:check": "npx prettier --check \"**/*.{json,yml,md}\""
+  },
+  "devDependencies": {
+    "@dmitriyzverev/prettier-config": "2.0.0",
+    "prettier": "3.6.2"
+  }
+}

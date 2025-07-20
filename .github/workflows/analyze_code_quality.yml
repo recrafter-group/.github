@@ -1,0 +1,19 @@
+name: Analyze code quality
+on:
+    workflow_call:
+jobs:
+    analyze_code_quality:
+        name: Analyze code quality
+        runs-on: ubuntu-22.04
+        steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v4.2.2
+            - name: Set up Node.js
+              uses: actions/setup-node@v4.4.0
+              with:
+                  node-version: 22
+                  cache: npm
+            - name: Install Node.js dependencies
+              run: npm ci
+            - name: Run code quality analyzer
+              run: npm run analyzer:code:check

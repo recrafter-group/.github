@@ -1,0 +1,26 @@
+name: Build
+on:
+    workflow_call:
+jobs:
+    build:
+        name: Build
+        runs-on: ubuntu-22.04
+        steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v4.2.2
+            - name: Set up Node.js
+              uses: actions/setup-node@v4.4.0
+              with:
+                  node-version: 22
+                  cache: npm
+            - name: Install Node.js dependencies
+              run: npm ci
+            - name: Build package
+              run: npm run build
+            - name: Upload the built artifact
+              uses: actions/upload-artifact@v4.4.3
+              with:
+                  name: package
+                  path: ./.package/
+                  if-no-files-found: error
+                  include-hidden-files: true

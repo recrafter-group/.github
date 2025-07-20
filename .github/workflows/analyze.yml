@@ -1,0 +1,26 @@
+name: Analyze code
+on:
+    workflow_call:
+        inputs:
+            format:
+                type: boolean
+                default: true
+                required: false
+            code_quality:
+                type: boolean
+                default: true
+                required: false
+            api_quality:
+                type: boolean
+                default: true
+                required: false
+jobs:
+    check_code_format:
+        uses: ./.github/workflows/check_code_format.yml
+        if: ${{ inputs.format == true }}
+    analyze_code_quality:
+        uses: ./.github/workflows/analyze_code_quality.yml
+        if: ${{ inputs.code_quality == true }}
+    analyze_api_quality:
+        uses: ./.github/workflows/analyze_api_quality.yml
+        if: ${{ inputs.api_quality == true }}

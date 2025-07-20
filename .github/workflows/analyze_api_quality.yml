@@ -1,0 +1,24 @@
+name: Analyze public API quality
+on:
+    workflow_call:
+jobs:
+    analyze_api_quality:
+        name: Analyze API quality
+        runs-on: ubuntu-22.04
+        steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v4.2.2
+            - name: Set up Node.js
+              uses: actions/setup-node@v4.4.0
+              with:
+                  node-version: 22
+                  cache: npm
+            - name: Install Node.js dependencies
+              run: npm ci
+            - name: Use built package
+              uses: actions/download-artifact@v4.3.0
+              with:
+                  name: package
+                  path: ./.package/
+            - name: Analyze API quality
+              run: npm run analyzer:api:check

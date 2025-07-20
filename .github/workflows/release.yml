@@ -1,0 +1,35 @@
+name: Release NPM package
+on:
+    workflow_call:
+        secrets:
+            npm_token:
+                description: NPM registry auth token
+                required: true
+jobs:
+    build:
+        name: Build NPM package
+        uses: ./.github/workflows/build.yml
+    publish:
+        name: Publish NPM package
+        runs-on: ubuntu-22.04
+        needs:
+            - build
+        steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v4.2.2
+            - name: Set up Node.js
+              uses: actions/setup-node@v4.4.0
+              with:
+                  node-version: 22
+                  cache: npm
+                  registry-url: https://registry.npmjs.org/
+            - name: Use built package
+              uses: actions/download-artifact@master
+              with:
+                  name: package
+                  path: ./.package/
+            - name: Publish NPM package
+              working-directory: ./.package
+              run: npm publish --access public
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.npm_token }}

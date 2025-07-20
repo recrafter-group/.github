@@ -1,0 +1,7 @@
+name: Check pull request
+on:
+    - pull_request
+jobs:
+    check_code_format:
+        name: Check code format
+        uses: ./.github/workflows/check_code_format.yml
