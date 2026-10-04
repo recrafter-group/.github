@@ -1,0 +1,59 @@
+name: Mutation test
+on:
+    workflow_call:
+        inputs:
+            reports-path:
+                description: Path to the directory with mutation reports
+                type: string
+                required: false
+                default: ./.stryker/reports/
+            markdown-report-path:
+                description: Path to the markdown mutation report
+                type: string
+                required: false
+                default: ./.stryker/reports/mutation.md
+
+jobs:
+    mutation_test:
+        name: Mutation test
+        runs-on: ubuntu-22.04
+        permissions:
+            contents: read
+            pull-requests: write
+        steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v4.2.2
+            - name: Set up Node.js
+              uses: actions/setup-node@v4.4.0
+              with:
+                  node-version: 22
+                  cache: npm
+            - name: Install Node.js dependencies
+              run: npm ci
+            - name: Run mutation tests
+              run: npm run test:mutation
+            - name: Upload mutation report
+              id: upload-mutation-report
+              if: ${{ !cancelled() }}
+              uses: actions/upload-artifact@v4.4.3
+              with:
+                  name: mutation-report
+                  path: ${{ inputs.reports-path }}
+                  if-no-files-found: error
+                  include-hidden-files: true
+            - name: Build mutation report comment
+              if: ${{ !cancelled() }}
+              env:
+                  MARKDOWN_REPORT_PATH: ${{ inputs.markdown-report-path }}
+              run: |
+                  echo '## Mutation testing' > mutation-comment.md
+                  echo '' >> mutation-comment.md
+                  cat "$MARKDOWN_REPORT_PATH" >> mutation-comment.md
+                  echo '' >> mutation-comment.md
+                  echo "[Download report](${{ steps.upload-mutation-report.outputs.artifact-url }})" >> mutation-comment.md
+            - name: Comment mutation report on pull request
+              if: ${{ !cancelled() }}
+              uses: marocchino/sticky-pull-request-comment@v3.0.2
+              with:
+                  header: mutation
+                  path: mutation-comment.md
